@@ -11,12 +11,33 @@ namespace Logic.NUnitTests
     [TestFixture]
     public class NumericMethodsTests
     {
+        #region TestCases
         static object[] InsertNumberCases =
         {
             new object[] { 15, 15, 0, 0, 15 },
             new object[] { 8, 15, 0, 0, 9 },
             new object[] { 8, 15, 3, 8, 120 }
         };
+
+        static object[] FilterDigitCases =
+       {
+            new object[] { new List<int> { 1, 2, 3, 4, 5, 6, 7, 68, 69, 70, 15, 17 }, 7, new List<int> { 7, 70, 17 } },
+            new object[] { new List<int> { 1, 1, 1, 4, 5, 6, 7 }, 0, new List<int> () },
+        };
+
+        static object[] FindNextBiggerNumberCases =
+        {
+            new object[] { 12, 21 },
+            new object[] { 2017, 2071 },
+            new object[] { 414, 441 },
+            new object[] { 144, 414 },
+            new object[] { 1234321, 1241233 },
+            new object[] { 1234126, 1234162 },
+            new object[] { 3456432, 3462345 },
+            new object[] { 10, -1 },
+            new object[] { 20, -1 },
+        };
+        #endregion
 
         [TestCaseSource("InsertNumberCases")]
         public void InsertNumer_Param_ShouldBeEqualToResult(int numberSource, int numberIn, int i, int j, int r)
@@ -51,12 +72,6 @@ namespace Logic.NUnitTests
 
             Assert.Throws<ArgumentOutOfRangeException>(() => NumericMethods.InsertNumber(numberSource, numberIn, i, j));
         }
-
-        static object[] FilterDigitCases =
-        {
-            new object[] { new List<int> { 1, 2, 3, 4, 5, 6, 7, 68, 69, 70, 15, 17 }, 7, new List<int> { 7, 70, 17 } },
-            new object[] { new List<int> { 1, 1, 1, 4, 5, 6, 7 }, 0, new List<int> () },
-        };
 
         [TestCaseSource("FilterDigitCases")]
         public void FilterDigit_Param_ShouldBeEqualToResult(List<int> numbers, int digit, List<int> result)
@@ -113,6 +128,19 @@ namespace Logic.NUnitTests
         public void FindNthRoot_AccuracyGreaterThanOne_Exception()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => NumericMethods.FindNthRoot(1, 2, 1.1));
+        }
+
+        [TestCaseSource("FindNextBiggerNumberCases")]
+        public void NextBiggerNumber_Params_EqualToResult(int number, int result)
+        {
+            int r = NumericMethods.FindNextBiggerNumber(number, out _);
+            Assert.AreEqual(result, r);
+        }
+
+        [Test]
+        public void NextBiggerNumber_NegativeNumber_Excepion()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => NumericMethods.FindNextBiggerNumber(-23, out _));
         }
     }
 }

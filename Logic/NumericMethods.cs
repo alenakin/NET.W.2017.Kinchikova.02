@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,6 +38,91 @@ namespace Logic
                 bitSource[i] = bitIn[k];
             bitSource.CopyTo(result, 0);
             return result[0];
+        }
+
+        /// <summary>
+        /// Finds the smallest number that is greater than number and has the same set of digits
+        /// </summary>
+        /// <param name="number">Positive number</param>
+        /// <param name="time">Variable to return the time spent on finding the number</param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <returns>The smallest number that is greater than number and has the same set of digits</returns>
+        public static int FindNextBiggerNumber(int number, out long time)
+        {
+            if (number < 0)
+                throw new ArgumentOutOfRangeException("Number must be positive");
+
+            Stopwatch s = new Stopwatch();
+            s.Start();
+            int result, i;
+            int[] digits = GetDigits(number);
+            int size = digits.Length;
+            int previousDigit = digits[size - 1];
+            for (i = size - 2; i >= 0; i--)
+            {
+                if (digits[i] < previousDigit)
+                {
+                    ChangeDigits(digits, i);
+                    break;
+                }
+                previousDigit = digits[i];
+            }
+            if (i < 0)
+                result = -1;
+            else
+                result = GetNumber(digits);
+            s.Stop();
+            time = s.ElapsedMilliseconds;
+            return result;
+        }
+
+        private static void ChangeDigits(int[] digits, int currentDigitIdx)
+        {
+            int minMoreThanCurrent = digits[currentDigitIdx + 1];
+            int minIdx = currentDigitIdx + 1;
+            int size = digits.Length;
+            for (int j = currentDigitIdx + 1; j < size; j++)
+                if (digits[j] < minMoreThanCurrent && digits[j] > digits[currentDigitIdx])
+                {
+                    minMoreThanCurrent = digits[j];
+                    Console.WriteLine(j);
+                    minIdx = j;
+                }
+            Swap(ref digits[currentDigitIdx], ref digits[minIdx]);
+            Array.Sort(digits, currentDigitIdx + 1, size - currentDigitIdx - 1);
+        }
+
+        private static void Swap(ref int a, ref int b)
+        {
+            int temp = a;
+            a = b;
+            b = temp;
+        }
+
+        private static int GetNumber(int[] digits)
+        {
+            int result = 0;
+            foreach (int i in digits)
+            {
+                result += i;
+                result *= 10;
+            }
+            return result / 10;
+        }
+
+        private static int[] GetDigits(int number)
+        {
+            var result = new List<int>();
+            int currentDigit = 0;
+            while (number != 0)
+            {
+                currentDigit = number % 10;
+                result.Add(currentDigit);
+                number -= currentDigit;
+                number /= 10;
+            }
+            result.Reverse();
+            return result.ToArray();
         }
 
         /// <summary>
